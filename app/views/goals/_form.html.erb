@@ -1,0 +1,22 @@
+<%= simple_form_for [@goal] do |f| %>
+  <%= render "shared/errors", object: @goal %>
+
+  <div class="space-y-4">
+    <%= f.input :goal_date, as: :date, label: "Date",
+        input_html: { value: @goal.goal_date&.strftime("%Y-%m-%d"), type: "date", min: 2.years.ago.to_date, max: 1.year.from_now.to_date } %>
+
+    <%= f.input :protein_goal, label: "Daily Protein Goal (grams)",
+        input_html: { min: 1, max: 1000, step: 0.5, placeholder: "e.g. 150" },
+        hint: "Recommended: 0.7–1g per lb of bodyweight" %>
+
+    <%= f.input :notes, as: :text, label: "Notes (optional)",
+        input_html: { rows: 2, placeholder: "e.g. cutting phase, post-workout day..." } %>
+
+    <div class="flex gap-3 pt-2">
+      <%= f.submit @goal.new_record? ? "Set Goal" : "Update Goal",
+          class: "bg-indigo-600 text-white px-5 py-2.5 rounded-lg font-medium hover:bg-indigo-700 cursor-pointer" %>
+      <%= link_to "Cancel", @goal.new_record? ? goals_path : goal_path(@goal),
+          class: "text-gray-500 px-4 py-2.5 rounded-lg hover:text-gray-700" %>
+    </div>
+  </div>
+<% end %>

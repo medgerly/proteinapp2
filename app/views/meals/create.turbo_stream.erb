@@ -1,0 +1,7 @@
+<%= turbo_stream.prepend "meals-list",
+    partial: "meals/meal_card",
+    locals: { meal: @meal, goal: @goal } %>
+
+<%= turbo_stream.replace "goal-progress",
+    partial: "goals/progress_bar",
+    locals: { goal: @goal } %>

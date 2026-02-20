@@ -1,0 +1,12 @@
+Hey <%= @user.first_name %>,
+
+Time to track your protein today!
+
+<% if @goal %>
+You've logged <%= @protein_logged %>g of your <%= @protein_goal.to_i %>g goal.
+You still need <%= @remaining %>g of protein.
+<% else %>
+You haven't set a protein goal for today yet.
+<% end %>
+
+Open Protein Tracker: <%= authenticated_root_url %>

@@ -1,0 +1,147 @@
+<% content_for :title, "Dashboard - Protein Tracker" %>
+
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Good <%= time_of_day_greeting %>, <%= current_user.first_name %>!</h1>
+      <p class="text-gray-500 text-sm mt-1"><%= Date.today.strftime("%A, %B %-d, %Y") %></p>
+    </div>
+    <div class="flex gap-3">
+      <% if @today_goal %>
+        <%= link_to "Log Meal", new_goal_meal_path(@today_goal),
+            class: "bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700" %>
+      <% else %>
+        <%= link_to "Set Today's Goal", new_goal_path(goal: { goal_date: Date.today }),
+            class: "bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700" %>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Today's Progress -->
+  <% if @today_goal %>
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="font-semibold text-gray-900">Today's Protein Progress</h2>
+        <%= link_to "View Details", goal_path(@today_goal), class: "text-sm text-indigo-600 hover:underline" %>
+      </div>
+
+      <div class="flex items-end gap-4 mb-4">
+        <div class="text-5xl font-bold text-indigo-600"><%= @today_goal.protein_total %>g</div>
+        <div class="text-gray-400 text-lg mb-1">/ <%= @today_goal.protein_goal.to_i %>g goal</div>
+        <% if @streak > 0 %>
+          <div class="ml-auto bg-amber-50 text-amber-700 text-sm font-medium px-3 py-1 rounded-full">
+            🔥 <%= @streak %> day streak
+          </div>
+        <% end %>
+      </div>
+
+      <div class="w-full bg-gray-100 rounded-full h-3 mb-3">
+        <div class="<%= @today_goal.met_goal? ? 'bg-green-500' : 'bg-indigo-500' %> h-3 rounded-full transition-all"
+             style="width: <%= @today_goal.protein_progress_pct %>%"></div>
+      </div>
+
+      <div class="flex justify-between text-sm text-gray-500">
+        <span><%= @today_goal.protein_remaining %>g remaining</span>
+        <span><%= @today_goal.protein_progress_pct %>% complete</span>
+      </div>
+
+      <!-- Macro breakdown -->
+      <div class="grid grid-cols-3 gap-4 mt-5 pt-5 border-t border-gray-100">
+        <div class="text-center">
+          <div class="text-2xl font-semibold text-blue-600"><%= @today_goal.carbs_total %>g</div>
+          <div class="text-xs text-gray-500 mt-1">Carbs</div>
+        </div>
+        <div class="text-center">
+          <div class="text-2xl font-semibold text-yellow-600"><%= @today_goal.fat_total %>g</div>
+          <div class="text-xs text-gray-500 mt-1">Fat</div>
+        </div>
+        <div class="text-center">
+          <div class="text-2xl font-semibold text-orange-600"><%= @today_goal.calories_total.to_i %></div>
+          <div class="text-xs text-gray-500 mt-1">Calories</div>
+        </div>
+      </div>
+    </div>
+  <% else %>
+    <div class="bg-white rounded-xl shadow-sm border border-dashed border-gray-300 p-8 text-center">
+      <div class="text-4xl mb-3">🎯</div>
+      <h3 class="font-semibold text-gray-700 mb-1">No goal set for today</h3>
+      <p class="text-sm text-gray-500 mb-4">Set a protein goal to start tracking your meals.</p>
+      <%= link_to "Set Today's Goal", new_goal_path(goal: { goal_date: Date.today }),
+          class: "bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700" %>
+    </div>
+  <% end %>
+
+  <!-- Weekly Chart -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+    <h2 class="font-semibold text-gray-900 mb-4">Weekly Protein Intake</h2>
+    <canvas id="weeklyChart" height="100"></canvas>
+  </div>
+
+  <!-- Recent Meals -->
+  <% if @recent_meals.any? %>
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="font-semibold text-gray-900">Recent Meals</h2>
+        <%= link_to "All Goals", goals_path, class: "text-sm text-indigo-600 hover:underline" %>
+      </div>
+      <div class="space-y-3">
+        <% @recent_meals.each do |meal| %>
+          <div class="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+            <div class="flex items-center gap-3">
+              <% if meal.meal_image.present? && meal.meal_image_url.present? %>
+                <%= image_tag meal.meal_image_url, class: "w-10 h-10 rounded-lg object-cover" %>
+              <% else %>
+                <div class="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center text-lg">🍽️</div>
+              <% end %>
+              <div>
+                <div class="text-sm font-medium text-gray-800"><%= meal.meal_name %></div>
+                <div class="text-xs text-gray-400"><%= meal.logged_on&.strftime("%b %-d") %></div>
+              </div>
+            </div>
+            <div class="text-sm font-semibold text-indigo-600"><%= meal.protein %>g</div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<script>
+  const weeklyData = <%= raw @weekly_data.to_json %>;
+  const ctx = document.getElementById('weeklyChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: weeklyData.map(d => d.date),
+      datasets: [
+        {
+          label: 'Protein (g)',
+          data: weeklyData.map(d => d.total),
+          backgroundColor: 'rgba(99, 102, 241, 0.8)',
+          borderRadius: 4
+        },
+        {
+          label: 'Goal (g)',
+          data: weeklyData.map(d => d.target),
+          type: 'line',
+          borderColor: 'rgb(245, 158, 11)',
+          borderWidth: 2,
+          borderDash: [5, 5],
+          pointRadius: 3,
+          fill: false,
+          tension: 0.3
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'top' }
+      },
+      scales: {
+        y: { beginAtZero: true, ticks: { callback: v => v + 'g' } }
+      }
+    }
+  });
+</script>

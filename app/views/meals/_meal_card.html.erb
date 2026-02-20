@@ -1,0 +1,30 @@
+<div id="meal-<%= meal.id %>" class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+  <div class="flex items-center gap-4">
+    <% if meal.meal_image.present? && meal.meal_image_url.present? %>
+      <%= image_tag meal.meal_image_url, class: "w-16 h-16 rounded-lg object-cover flex-shrink-0",
+          alt: meal.meal_name %>
+    <% else %>
+      <div class="w-16 h-16 rounded-lg bg-indigo-50 flex items-center justify-center text-2xl flex-shrink-0">🍽️</div>
+    <% end %>
+
+    <div class="flex-1 min-w-0">
+      <div class="flex items-start justify-between">
+        <h3 class="font-semibold text-gray-800 truncate"><%= meal.meal_name %></h3>
+        <div class="text-lg font-bold text-indigo-600 ml-3 flex-shrink-0"><%= meal.protein %>g</div>
+      </div>
+      <div class="flex gap-4 text-xs text-gray-500 mt-1">
+        <span>Carbs: <%= meal.carbs.to_f.round(1) %>g</span>
+        <span>Fat: <%= meal.fat.to_f.round(1) %>g</span>
+        <span>Cal: <%= meal.calories.to_f.round(0).to_i %></span>
+      </div>
+    </div>
+
+    <div class="flex gap-2 flex-shrink-0">
+      <%= link_to "Edit", edit_goal_meal_path(goal, meal),
+          class: "text-xs text-gray-400 hover:text-indigo-600 px-2 py-1" %>
+      <%= link_to "Remove", goal_meal_path(goal, meal),
+          data: { turbo_method: :delete, turbo_confirm: "Remove #{meal.meal_name}?" },
+          class: "text-xs text-red-400 hover:text-red-600 px-2 py-1" %>
+    </div>
+  </div>
+</div>
