@@ -1,0 +1,92 @@
+<%= simple_form_for [@goal, @meal] do |f| %>
+  <%= render "shared/errors", object: @meal %>
+
+  <!-- AI Estimator -->
+  <div class="bg-indigo-50 rounded-xl p-4 mb-5" data-controller="ai-estimator"
+       data-ai-estimator-url-value="<%= estimate_goal_meals_path(@goal) %>">
+    <h3 class="text-sm font-semibold text-indigo-700 mb-2">🤖 AI Macro Estimator</h3>
+    <p class="text-xs text-indigo-500 mb-3">Describe your meal and we'll estimate the macros.</p>
+    <div class="flex gap-2">
+      <input type="text" id="ai_description"
+             placeholder="e.g. grilled chicken breast with rice and broccoli"
+             class="flex-1 border border-indigo-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white"
+             data-ai-estimator-target="description" />
+      <button type="button"
+              data-action="click->ai-estimator#estimate"
+              data-ai-estimator-target="button"
+              class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700">
+        Estimate
+      </button>
+    </div>
+    <div data-ai-estimator-target="status" class="text-xs text-indigo-400 mt-2 hidden">
+      Estimating...
+    </div>
+  </div>
+
+  <!-- Quick fill from saved meals -->
+  <% if @templates.any? %>
+    <div class="mb-5">
+      <label class="block text-sm font-medium text-gray-700 mb-2">Quick Add from Saved Meals</label>
+      <div class="flex flex-wrap gap-2">
+        <% @templates.first(6).each do |t| %>
+          <button type="button"
+                  class="text-xs bg-gray-100 hover:bg-indigo-50 hover:text-indigo-700 text-gray-600 px-3 py-1.5 rounded-full border border-gray-200 transition-colors"
+                  data-meal-name="<%= t.meal_name %>"
+                  data-protein="<%= t.protein %>"
+                  data-carbs="<%= t.carbs %>"
+                  data-fat="<%= t.fat %>"
+                  data-calories="<%= t.calories %>"
+                  onclick="fillFromTemplate(this)">
+            <%= t.meal_name %> (<%= t.protein %>g)
+          </button>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="space-y-4">
+    <%= f.input :meal_name, label: "Meal Name", input_html: { id: "meal_meal_name", placeholder: "e.g. Chicken & Rice", autocomplete: "off" } %>
+
+    <div class="grid grid-cols-2 gap-4">
+      <%= f.input :protein, label: "Protein (g)", input_html: { id: "meal_protein", min: 0, max: 500, step: 0.1, placeholder: "0.0" } %>
+      <%= f.input :calories, label: "Calories", input_html: { id: "meal_calories", min: 0, max: 5000, step: 1, placeholder: "0" } %>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <%= f.input :carbs, label: "Carbs (g)", input_html: { id: "meal_carbs", min: 0, max: 1000, step: 0.1, placeholder: "0.0" } %>
+      <%= f.input :fat, label: "Fat (g)", input_html: { id: "meal_fat", min: 0, max: 500, step: 0.1, placeholder: "0.0" } %>
+    </div>
+
+    <%= f.input :logged_on, as: :date, label: "Date",
+        input_html: { type: "date", value: @meal.logged_on&.strftime("%Y-%m-%d") || @goal.goal_date.strftime("%Y-%m-%d") } %>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Meal Photo (optional)</label>
+      <% if @meal.meal_image.present? && !@meal.new_record? %>
+        <div class="mb-2">
+          <%= image_tag @meal.meal_image_url, class: "w-24 h-24 rounded-lg object-cover", alt: "Meal photo" %>
+          <%= f.input :remove_meal_image, as: :boolean, label: "Remove photo" %>
+        </div>
+      <% end %>
+      <%= f.input :meal_image, as: :file, label: false,
+          input_html: { accept: "image/*", capture: "camera", class: "text-sm text-gray-600 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" } %>
+    </div>
+
+    <div class="flex gap-3 pt-2">
+      <%= f.submit @meal.new_record? ? "Log Meal" : "Update Meal",
+          class: "bg-indigo-600 text-white px-5 py-2.5 rounded-lg font-medium hover:bg-indigo-700 cursor-pointer" %>
+      <%= link_to "Cancel", goal_path(@goal),
+          class: "text-gray-500 px-4 py-2.5 rounded-lg hover:text-gray-700" %>
+    </div>
+  </div>
+<% end %>
+
+<script>
+function fillFromTemplate(btn) {
+  document.getElementById('meal_meal_name').value = btn.dataset.mealName;
+  document.getElementById('meal_protein').value = btn.dataset.protein;
+  document.getElementById('meal_carbs').value = btn.dataset.carbs;
+  document.getElementById('meal_fat').value = btn.dataset.fat;
+  document.getElementById('meal_calories').value = btn.dataset.calories;
+}
+</script>

@@ -1,0 +1,30 @@
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-purple-50">
+  <div class="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md">
+    <div class="text-center mb-8">
+      <div class="text-5xl mb-3">💪</div>
+      <h1 class="text-2xl font-bold text-gray-900">Create Account</h1>
+      <p class="text-gray-500 mt-1">Start tracking your protein today.</p>
+    </div>
+
+    <%= simple_form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
+      <%= render "shared/errors", object: resource %>
+
+      <div class="grid grid-cols-2 gap-3">
+        <%= f.input :first_name, required: true, autofocus: true %>
+        <%= f.input :last_name, required: true %>
+      </div>
+      <%= f.input :email, required: true, input_html: { autocomplete: "email" } %>
+      <%= f.input :password, required: true,
+          hint: ("#{@minimum_password_length} characters minimum" if @minimum_password_length),
+          input_html: { autocomplete: "new-password" } %>
+      <%= f.input :password_confirmation, required: true,
+          input_html: { autocomplete: "new-password" } %>
+
+      <%= f.submit "Create Account", class: "w-full bg-indigo-600 text-white py-2.5 px-4 rounded-lg font-medium hover:bg-indigo-700 transition-colors cursor-pointer mt-2" %>
+    <% end %>
+
+    <div class="text-center mt-6 text-sm text-gray-500">
+      Already have an account? <%= link_to "Sign in", new_user_session_path, class: "text-indigo-600 font-medium hover:underline" %>
+    </div>
+  </div>
+</div>

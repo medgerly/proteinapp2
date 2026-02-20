@@ -1,5 +1,24 @@
-# rails-8-template
+# README
 
-For your AppDev Projects!
+This README would normally document whatever steps are necessary to get the
+application up and running.
 
-All files are covered by the MIT license, see [LICENSE.txt](LICENSE.txt).
+Things you may want to cover:
+
+* Ruby version
+
+* System dependencies
+
+* Configuration
+
+* Database creation
+
+* Database initialization
+
+* How to run the test suite
+
+* Services (job queues, cache servers, search engines, etc.)
+
+* Deployment instructions
+
+* ...

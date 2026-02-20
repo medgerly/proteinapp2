@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title><%= content_for(:title) || "Protein Tracker" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <link rel="icon" href="/icon.png" type="image/png">
+
+    <!-- Tailwind via CDN for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="bg-gray-50 min-h-screen">
+    <%= render "shared/navbar" if user_signed_in? %>
+
+    <% if flash[:notice] %>
+      <div class="max-w-7xl mx-auto px-4 pt-4">
+        <div class="bg-green-50 border border-green-200 text-green-800 rounded-lg px-4 py-3 text-sm" role="alert">
+          <%= flash[:notice] %>
+        </div>
+      </div>
+    <% end %>
+
+    <% if flash[:alert] %>
+      <div class="max-w-7xl mx-auto px-4 pt-4">
+        <div class="bg-red-50 border border-red-200 text-red-800 rounded-lg px-4 py-3 text-sm" role="alert">
+          <%= flash[:alert] %>
+        </div>
+      </div>
+    <% end %>
+
+    <main class="max-w-7xl mx-auto px-4 py-6">
+      <%= yield %>
+    </main>
+  </body>
+</html>
