@@ -7,41 +7,39 @@ RSpec.describe GoalPolicy, type: :policy do
   let(:goal) { create_goal(user, goal_date: Date.today) }
   let(:other_goal) { create_goal(other_user, goal_date: Date.today) }
 
-  subject { described_class }
-
-  permissions :show? do
+  describe "#show?" do
     it "grants access to owner" do
-      expect(subject).to permit(user, goal)
+      expect(described_class.new(user, goal).show?).to be true
     end
 
     it "denies access to other users" do
-      expect(subject).not_to permit(other_user, goal)
+      expect(described_class.new(other_user, goal).show?).to be false
     end
   end
 
-  permissions :create? do
+  describe "#create?" do
     it "grants access to any authenticated user" do
-      expect(subject).to permit(user, Goal.new)
+      expect(described_class.new(user, Goal.new).create?).to be true
     end
   end
 
-  permissions :update? do
+  describe "#update?" do
     it "grants access to owner" do
-      expect(subject).to permit(user, goal)
+      expect(described_class.new(user, goal).update?).to be true
     end
 
     it "denies access to other users" do
-      expect(subject).not_to permit(other_user, goal)
+      expect(described_class.new(other_user, goal).update?).to be false
     end
   end
 
-  permissions :destroy? do
+  describe "#destroy?" do
     it "grants access to owner" do
-      expect(subject).to permit(user, goal)
+      expect(described_class.new(user, goal).destroy?).to be true
     end
 
     it "denies access to other users" do
-      expect(subject).not_to permit(other_user, goal)
+      expect(described_class.new(other_user, goal).destroy?).to be false
     end
   end
 end
