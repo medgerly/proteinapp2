@@ -9,37 +9,35 @@ RSpec.describe MealPolicy, type: :policy do
   let(:meal) { create_meal(goal) }
   let(:other_meal) { create_meal(other_goal) }
 
-  subject { described_class }
-
-  permissions :create? do
+  describe "#create?" do
     it "grants access when goal belongs to user" do
       new_meal = goal.meals.build(meal_name: "Test", protein: 20)
-      expect(subject).to permit(user, new_meal)
+      expect(described_class.new(user, new_meal).create?).to be true
     end
 
     it "denies access when goal belongs to other user" do
       new_meal = other_goal.meals.build(meal_name: "Test", protein: 20)
-      expect(subject).not_to permit(user, new_meal)
+      expect(described_class.new(user, new_meal).create?).to be false
     end
   end
 
-  permissions :update? do
+  describe "#update?" do
     it "grants access to meal owner" do
-      expect(subject).to permit(user, meal)
+      expect(described_class.new(user, meal).update?).to be true
     end
 
     it "denies access to non-owner" do
-      expect(subject).not_to permit(other_user, meal)
+      expect(described_class.new(other_user, meal).update?).to be false
     end
   end
 
-  permissions :destroy? do
+  describe "#destroy?" do
     it "grants access to meal owner" do
-      expect(subject).to permit(user, meal)
+      expect(described_class.new(user, meal).destroy?).to be true
     end
 
     it "denies access to non-owner" do
-      expect(subject).not_to permit(other_user, meal)
+      expect(described_class.new(other_user, meal).destroy?).to be false
     end
   end
 end

@@ -1,0 +1,74 @@
+# This file is auto-generated from the current state of the database. Instead
+# of editing this file, please use the migrations feature of Active Record to
+# incrementally modify your database, and then regenerate this schema definition.
+#
+# This file is the source Rails uses to define your schema when running `bin/rails
+# db:schema:load`. When creating a new database, `bin/rails db:schema:load` tends to
+# be faster and is potentially less error prone than running all of your
+# migrations from scratch. Old migrations may fail to apply correctly if those
+# migrations use external dependencies or application code.
+#
+# It's strongly recommended that you check this file into your version control system.
+
+ActiveRecord::Schema[8.0].define(version: 2024_01_01_000004) do
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "pg_catalog.plpgsql"
+
+  create_table "goals", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.float "protein_goal", null: false
+    t.date "goal_date", null: false
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "goal_date"], name: "index_goals_on_user_id_and_goal_date"
+    t.index ["user_id"], name: "index_goals_on_user_id"
+  end
+
+  create_table "meal_templates", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "meal_name", null: false
+    t.float "protein", default: 0.0, null: false
+    t.float "carbs", default: 0.0
+    t.float "fat", default: 0.0
+    t.float "calories", default: 0.0
+    t.integer "times_used", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "meal_name"], name: "index_meal_templates_on_user_id_and_meal_name"
+    t.index ["user_id"], name: "index_meal_templates_on_user_id"
+  end
+
+  create_table "meals", force: :cascade do |t|
+    t.bigint "goal_id", null: false
+    t.string "meal_name", null: false
+    t.float "protein", default: 0.0, null: false
+    t.float "carbs", default: 0.0
+    t.float "fat", default: 0.0
+    t.float "calories", default: 0.0
+    t.string "meal_image"
+    t.date "logged_on"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["goal_id"], name: "index_meals_on_goal_id"
+    t.index ["logged_on"], name: "index_meals_on_logged_on"
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.string "first_name", default: "", null: false
+    t.string "last_name", default: "", null: false
+    t.string "email", default: "", null: false
+    t.string "encrypted_password", default: "", null: false
+    t.string "reset_password_token"
+    t.datetime "reset_password_sent_at"
+    t.datetime "remember_created_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+  end
+
+  add_foreign_key "goals", "users"
+  add_foreign_key "meal_templates", "users"
+  add_foreign_key "meals", "goals"
+end

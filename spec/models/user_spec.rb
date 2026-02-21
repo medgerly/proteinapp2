@@ -76,7 +76,7 @@ RSpec.describe User, type: :model do
     it "includes date, total, and target keys" do
       user = create_user
       data = user.weekly_protein_data
-      expect(data.first.keys).to include("date", "total", "target")
+      expect(data.first.keys).to include(:date, :total, :target)
     end
   end
 end
