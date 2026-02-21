@@ -95,7 +95,9 @@ GEM
       ostruct (~> 0.2)
       tty-spinner (~> 0.9.3)
     amazing_print (1.8.1)
-    annotaterb (4.14.0)
+    annotaterb (4.22.0)
+      activerecord (>= 6.0.0)
+      activesupport (>= 6.0.0)
     appdev_support (0.2.1)
       tabulo
     ast (2.4.2)
